@@ -1,0 +1,5 @@
+.env
+venv
+roms/*
+__pycache__
+screen*
