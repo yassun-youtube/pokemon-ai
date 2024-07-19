@@ -3,3 +3,4 @@ venv
 roms/*
 __pycache__
 screen*
+.idea

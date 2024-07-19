@@ -3,6 +3,9 @@ import websockets
 import json
 from pyboy import PyBoy
 from pyboy.utils import WindowEvent
+from openai_wrapper.chat_completion import chat_completion
+from aws_wrapper.dynamodb import get_connection_id
+from aws_wrapper.apigatewaymanagementapi import send_websocket_message
 
 # WebSocketのエンドポイントURL
 uri = "wss://s07tuceu77.execute-api.ap-northeast-1.amazonaws.com/dev/"
@@ -11,6 +14,7 @@ uri = "wss://s07tuceu77.execute-api.ap-northeast-1.amazonaws.com/dev/"
 pyboy = PyBoy('./roms/pokemon_red.gb', log_level="DEBUG", scale=4)
 
 pyboy.screen
+
 
 async def send_heartbeat(websocket):
     while True:
@@ -71,18 +75,45 @@ async def handle_websocket(websocket):
         print(f"Error: {e}")
     finally:
         print("finally!!!")
+        handle_websocket(websocket)
 
     # 接続が切れた場合にはハートビートタスクをキャンセル
     # heartbeat_task.cancel()
 
 
+async def handle_chatgpt(actions):
+    if pyboy.frame_count % 180 == 0:
+        print('handle_chatgpt')
+        image = pyboy.screen.image
+        image.save('screen.png')
+
+        if len(actions) > 0:
+            print('next_action')
+            next_action = actions.pop()
+            connection_id = get_connection_id()
+            send_websocket_message(connection_id, json.dumps(next_action))
+        else:
+            print('ask chat gpt')
+            response = chat_completion('次の行動を教えて下さい')
+            print(f'response: {response}')
+            content = response.choices[0].message.content
+            print(f'content: {content}')
+            next_actions = json.loads(content)
+            if isinstance(next_actions, list):
+                actions.extend(next_actions)
+            else:
+                actions.append(next_actions)
+
+
 async def main():
+    actions = []
     async with websockets.connect(uri) as websocket:
         websocket_task = asyncio.create_task(handle_websocket(websocket))
 
         # PyBoyのメインループ
         while pyboy.tick():
             await asyncio.sleep(0)  # イベントループの他のタスクを実行
+            await asyncio.create_task(handle_chatgpt(actions))
 
         await websocket_task  # WebSocketタスクの終了を待つ
 
