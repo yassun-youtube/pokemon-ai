@@ -19,7 +19,7 @@ def send_websocket_message(connection_id, message):
             ConnectionId=connection_id,
             Data=message_bytes
         )
-        print("Message posted successfully")
+        # print("Message posted successfully")
     except client.exceptions.GoneException:
         print("The connection is no longer available.")
     except client.exceptions.LimitExceededException:

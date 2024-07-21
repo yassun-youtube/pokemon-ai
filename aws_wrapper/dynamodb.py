@@ -22,7 +22,7 @@ def get_connection_id():
         item = response.get('Item')
 
         if item:
-            print("Item found:", item)
+            # print("Item found:", item)
             return item['connectionId']['S']
         else:
             print("Item not found")

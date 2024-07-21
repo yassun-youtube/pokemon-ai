@@ -4,3 +4,5 @@ roms/*
 __pycache__
 screen*
 .idea
+logs/*
+.DS_Store
