@@ -4,6 +4,7 @@ from aws_wrapper.apigatewaymanagementapi import send_websocket_message
 import json
 import time
 import logging
+from openai_wrapper.prompts.transport_prompt import transport_prompt
 
 from openai_wrapper.prompts.battle_prompt import BATTLE_PROMPT
 
@@ -29,7 +30,7 @@ while True:
             actions_logs.pop(0)
         send_websocket_message(connection_id, json.dumps(next_action))
     else:
-        response = chat_completion('次の行動を教えて下さい', BATTLE_PROMPT, "\n".join(actions_logs))
+        response = chat_completion('次の行動を教えて下さい', transport_prompt(actions_logs))
         content = response.choices[0].message.content
         print(f'content: {content}')
         logger.info(content)

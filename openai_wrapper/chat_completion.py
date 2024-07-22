@@ -8,7 +8,7 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-def chat_completion(text, prompt, logs):
+def chat_completion(text, prompt):
   base64_image = image_to_base64('./screen.png')
   return client.chat.completions.create(
     model="gpt-4o-mini",
@@ -16,7 +16,7 @@ def chat_completion(text, prompt, logs):
     messages=[
       {"role": "system", "content": prompt },
       {"role": "user", "content": [
-        {"type": "text", "text": text},
+        {"type": "text", "text": text + "画像を認識する際の補足情報：画面上の黒い部分は主人公が移動できない場所であり、黒い部分に主人公を移動しても移動できません。"},
         {
           "type": "image_url",
           "image_url": {

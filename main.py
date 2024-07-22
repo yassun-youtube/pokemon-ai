@@ -31,7 +31,7 @@ async def handle_websocket(websocket):
             message = await websocket.recv()
             print(f"Received message: {message}")
             data = json.loads(message)
-            print(f"Received message: {data}")
+            # print(f"Received message: {data}")
             # PyBoyのイベント処理
             if data['action'] == 'move_up':
                 pyboy.send_input(WindowEvent.PRESS_ARROW_UP)
