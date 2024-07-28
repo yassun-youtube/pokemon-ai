@@ -9,6 +9,7 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def chat_completion(text, prompt):
+  print('asking chatgpt...')
   base64_image = image_to_base64('./screen.png')
   return client.chat.completions.create(
     model="gpt-4o-mini",

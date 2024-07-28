@@ -30,13 +30,18 @@ while True:
             actions_logs.pop(0)
         send_websocket_message(connection_id, json.dumps(next_action))
     else:
-        response = chat_completion('次の行動を教えて下さい', transport_prompt(actions_logs))
-        content = response.choices[0].message.content
-        print(f'content: {content}')
-        logger.info(content)
-        next_actions = json.loads(content)
-        commands = next_actions['commands']
-        if isinstance(commands, list):
-            actions.extend(commands)
-        else:
-            actions.append(commands)
+        with open('array.json', 'r') as f:
+            array_list = json.load(f)
+            response = chat_completion(
+                '次の行動を教えて下さい',
+                transport_prompt(json.dumps(array_list), actions_logs)
+            )
+            content = response.choices[0].message.content
+            print(f'content: {content}')
+            logger.info(content)
+            next_actions = json.loads(content)
+            commands = next_actions['commands']
+            if isinstance(commands, list):
+                actions.extend(commands)
+            else:
+                actions.append(commands)
